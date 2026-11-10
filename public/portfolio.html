@@ -179,6 +179,31 @@ section { padding: 96px 0; position: relative; }
 }
 .nav-links a:hover { color: var(--text); text-decoration: none; background: var(--surface); }
 .nav-links a.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+/* "Ezy" dropdown: grouped under one trigger, revealed on hover (desktop) or
+   click/tap (the .open class, toggled by JS for touch + keyboard support). */
+.has-dropdown { position: relative; }
+.dropdown-trigger {
+  display: inline-flex; align-items: center; gap: 4px; font: inherit;
+  color: var(--text-muted); font-size: .9rem; font-weight: 500; padding: 8px 12px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  transition: color .2s, background-color .2s;
+}
+.dropdown-trigger:hover { color: var(--text); background: var(--surface); }
+.dropdown-trigger svg { transition: transform .2s; }
+.has-dropdown:hover .dropdown-trigger svg,
+.has-dropdown.open .dropdown-trigger svg { transform: rotate(180deg); }
+.dropdown-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; min-width: 170px; margin: 0; padding: 6px;
+  list-style: none; border-radius: 12px; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .18s, transform .18s, visibility .18s;
+}
+.has-dropdown:hover .dropdown-menu,
+.has-dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown-menu a { display: block; white-space: nowrap; }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
 .icon-btn {
   width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
@@ -205,6 +230,17 @@ section { padding: 96px 0; position: relative; }
   }
   .nav-links.open { transform: none; opacity: 1; visibility: visible; }
   .nav-links a { padding: 12px 14px; font-size: 1rem; }
+
+  /* No hover on touch: the dropdown becomes a static nested list, opened
+     by tapping the trigger (JS toggles .open on .has-dropdown). */
+  .dropdown-trigger { width: 100%; justify-content: space-between; padding: 12px 14px; font-size: 1rem; }
+  .dropdown-menu {
+    position: static; opacity: 1; visibility: visible; transform: none;
+    background: none; border: 0; box-shadow: none; backdrop-filter: none;
+    padding: 0; margin: 0 0 0 14px; display: none;
+  }
+  .has-dropdown.open .dropdown-menu { display: block; }
+  .dropdown-menu a { padding: 10px 14px; font-size: 1rem; }
 }
 
 /* =====================================================================
@@ -623,8 +659,16 @@ footer .mono { font-family: var(--font-mono); font-size: .8rem; }
     <div class="nav-actions">
       <nav aria-label="Primary">
         <ul class="nav-links" id="navLinks">
-          <li><a href="/ezystudio">EzyStudio</a></li>
-          <li><a href="/feeds">Community</a></li>
+          <li class="has-dropdown" id="ezyDropdown">
+            <button type="button" class="dropdown-trigger" id="ezyDropdownTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="ezyDropdownMenu">
+              Ezy
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <ul class="dropdown-menu" id="ezyDropdownMenu">
+              <li><a href="/ezystudio">EzyStudio</a></li>
+              <li><a href="/feeds">Community</a></li>
+            </ul>
+          </li>
         </ul>
       </nav>
 
@@ -1165,6 +1209,24 @@ const TERMINAL_LINES = [
   menuBtn.addEventListener("click", () => setMenu(!navLinks.classList.contains("open")));
   navLinks.addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+
+  /* ---------- "Ezy" dropdown ---------- */
+  // Desktop reveals it on :hover via CSS; this adds click/tap support
+  // (touch screens have no hover) and closes it on an outside click or Escape.
+  const ezyDropdown = document.getElementById("ezyDropdown");
+  const ezyTrigger = document.getElementById("ezyDropdownTrigger");
+  function setEzyDropdown(open) {
+    ezyDropdown.classList.toggle("open", open);
+    ezyTrigger.setAttribute("aria-expanded", String(open));
+  }
+  ezyTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    setEzyDropdown(!ezyDropdown.classList.contains("open"));
+  });
+  document.addEventListener("click", (e) => {
+    if (!ezyDropdown.contains(e.target)) setEzyDropdown(false);
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setEzyDropdown(false); });
 
   /* ---------- Navbar background + back-to-top on scroll ---------- */
   const nav = document.getElementById("nav");
