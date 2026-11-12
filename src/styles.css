@@ -578,3 +578,20 @@ hr {
   margin-top: 8px;
   align-self: flex-start;
 }
+
+@media (max-width: 560px) {
+  .form-card {
+    padding: 20px;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .form-card .button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .form-success .button {
+    align-self: stretch;
+  }
+}
