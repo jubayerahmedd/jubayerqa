@@ -88,7 +88,9 @@ function RootComponent() {
                 this same hostname, not by this template. Routing it through the
                 client router would 404 inside this app instead of leaving it.
               */}
-              <a href="/feeds">Community</a>
+              <a href="/feeds">EzyCommunity</a>
+              {/* A real route in this app's own tree, so a <Link> is correct here. */}
+              <Link to="/testing/form">Form</Link>
             </nav>
           </div>
         </header>

@@ -669,6 +669,15 @@ footer .mono { font-family: var(--font-mono); font-size: .8rem; }
               <li><a href="/ezystudio">EzyStudio</a></li>
             </ul>
           </li>
+          <li class="has-dropdown" id="testingDropdown">
+            <button type="button" class="dropdown-trigger" id="testingDropdownTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="testingDropdownMenu">
+              Testing
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <ul class="dropdown-menu" id="testingDropdownMenu">
+              <li><a href="/testing/form">Form</a></li>
+            </ul>
+          </li>
         </ul>
       </nav>
 
@@ -1210,23 +1219,31 @@ const TERMINAL_LINES = [
   navLinks.addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
 
-  /* ---------- "Ezy" dropdown ---------- */
-  // Desktop reveals it on :hover via CSS; this adds click/tap support
-  // (touch screens have no hover) and closes it on an outside click or Escape.
-  const ezyDropdown = document.getElementById("ezyDropdown");
-  const ezyTrigger = document.getElementById("ezyDropdownTrigger");
-  function setEzyDropdown(open) {
-    ezyDropdown.classList.toggle("open", open);
-    ezyTrigger.setAttribute("aria-expanded", String(open));
+  /* ---------- Nav dropdowns ("Ezy", "Testing", ...) ---------- */
+  // Desktop reveals each on :hover via CSS; this adds click/tap support
+  // (touch screens have no hover), closes a dropdown on an outside click or
+  // Escape, and closes any other open one when a new one is opened.
+  const dropdowns = [...document.querySelectorAll(".has-dropdown")];
+  function setDropdown(el, open) {
+    el.classList.toggle("open", open);
+    el.querySelector(".dropdown-trigger")?.setAttribute("aria-expanded", String(open));
   }
-  ezyTrigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    setEzyDropdown(!ezyDropdown.classList.contains("open"));
+  dropdowns.forEach((dropdown) => {
+    const trigger = dropdown.querySelector(".dropdown-trigger");
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = !dropdown.classList.contains("open");
+      dropdowns.forEach((other) => setDropdown(other, other === dropdown && open));
+    });
   });
   document.addEventListener("click", (e) => {
-    if (!ezyDropdown.contains(e.target)) setEzyDropdown(false);
+    dropdowns.forEach((dropdown) => {
+      if (!dropdown.contains(e.target)) setDropdown(dropdown, false);
+    });
   });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setEzyDropdown(false); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") dropdowns.forEach((dropdown) => setDropdown(dropdown, false));
+  });
 
   /* ---------- Navbar background + back-to-top on scroll ---------- */
   const nav = document.getElementById("nav");
