@@ -213,6 +213,63 @@ hr {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
+.menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.menu-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 760px) {
+  .menu-btn {
+    display: flex;
+  }
+
+  .site-nav {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px 16px;
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-8px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s,
+      transform 0.2s,
+      visibility 0.2s;
+  }
+
+  .site-nav.open {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .site-nav a {
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+}
+
 .site-footer {
   margin-top: auto;
   border-top: 1px solid var(--line);

@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
 } from '@tanstack/react-router';
+import {useState} from 'react';
 
 import {BrandMark} from '../components/brand';
 import {NotFound} from '../components/not-found';
@@ -56,6 +57,7 @@ function NotFoundRoute() {
 function RootComponent() {
   const site = useSite();
   const name = site?.name ?? 'Community';
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <html lang="en">
@@ -74,7 +76,7 @@ function RootComponent() {
               <BrandMark site={site} />
               <span className="brand-name">{name}</span>
             </a>
-            <nav className="site-nav">
+            <nav className={menuOpen ? 'site-nav open' : 'site-nav'} onClick={() => setMenuOpen(false)}>
               <a href="/">Home</a>
               <Link to="/blog">Blog</Link>
               {/*
@@ -92,6 +94,17 @@ function RootComponent() {
               {/* A real route in this app's own tree, so a <Link> is correct here. */}
               <Link to="/testing/form">Form</Link>
             </nav>
+            <button
+              type="button"
+              className="icon-btn menu-btn"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(open => !open)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
+              </svg>
+            </button>
           </div>
         </header>
 
